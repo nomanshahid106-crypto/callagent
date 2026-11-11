@@ -23,12 +23,12 @@ export default function LivePage() {
     callerNumber: state.subscription?.callerNumber,
     minutesAllocated: state.subscription?.minutesAllocated,
     provisioningMode: state.subscription?.provisioningMode,
-    planId: state.subscription?.planId ?? "growth",
+    planId: state.subscription?.planId ?? "pack-100",
     email: state.user?.email,
   });
-  const plan = getPlan(state.subscription?.planId ?? "growth");
-  const included = plan?.includedMinutes ?? 400;
-  const overage = plan?.overageRate ?? 0.3;
+  const plan = getPlan(state.subscription?.planId ?? "pack-100");
+  const included = plan?.includedMinutes ?? 100;
+  const overage = plan?.overageRate ?? 0.25;
 
   useEffect(() => {
     if (!campaign || campaign.status !== "running") return;

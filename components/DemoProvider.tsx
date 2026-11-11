@@ -78,7 +78,7 @@ const DEFAULT_STATE: DemoState = {
   subscription: null,
   justSubscribed: null,
   wallet: 46.2,
-  minutesUsed: 212,
+  minutesUsed: 63,
   campaign: null,
 };
 

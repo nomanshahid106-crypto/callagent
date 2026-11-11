@@ -10,14 +10,14 @@ export default function DashboardHome() {
   const { state } = useDemo();
   const plan = state.subscription ? getPlan(state.subscription.planId) : undefined;
   const agent = state.subscription ? getAgent(state.subscription.agentSlug) : undefined;
-  const included = plan?.includedMinutes ?? 400;
+  const included = plan?.includedMinutes ?? 100;
   const pct = Math.min(100, Math.round((state.minutesUsed / included) * 100));
   // Provisioning (Step 3b): dedicated caller number + allocated plan minutes
   const prov = provisioningView({
     callerNumber: state.subscription?.callerNumber,
     minutesAllocated: state.subscription?.minutesAllocated,
     provisioningMode: state.subscription?.provisioningMode,
-    planId: state.subscription?.planId ?? "growth",
+    planId: state.subscription?.planId ?? "pack-100",
     email: state.user?.email,
   });
   const minutesRemaining = Math.max(0, prov.minutesAllocated - state.minutesUsed);
@@ -72,7 +72,7 @@ export default function DashboardHome() {
             <p className="muted" style={{ margin: 0 }}>
               {agent.icon} <strong style={{ color: "#fff" }}>{agent.name}</strong>{" "}
               is <span className="badge green">Active</span> on the {plan.name}{" "}
-              plan. Paste your phone numbers and press Start Calling — results
+              package. Paste your phone numbers and press Start Calling — results
               and summaries appear in Call Results.
             </p>
           ) : (

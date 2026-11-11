@@ -29,7 +29,7 @@ export function provisioningView(input: {
   return {
     callerNumber:
       input.callerNumber ?? demoCallerNumber(input.email ?? "demo@callagent.app"),
-    minutesAllocated: input.minutesAllocated ?? plan?.includedMinutes ?? 400,
+    minutesAllocated: input.minutesAllocated ?? plan?.includedMinutes ?? 100,
     isDemoNumber: input.provisioningMode !== "live",
   };
 }

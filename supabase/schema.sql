@@ -28,7 +28,7 @@ create table if not exists profiles (
 
 -- ─── Plans (owner-editable config — prices change without a deploy) ───────
 create table if not exists plans (
-  id text primary key,                      -- starter | growth | business
+  id text primary key,                      -- pack-50 | pack-100
   name text not null,
   price_monthly_usd numeric(10,2) not null,
   included_minutes int not null,
@@ -39,9 +39,8 @@ create table if not exists plans (
 );
 
 insert into plans (id, name, price_monthly_usd, included_minutes, overage_rate_usd, contacts_per_campaign) values
-  ('starter',  'Starter',  39,  150,  0.35, 500),
-  ('growth',   'Growth',   99,  400,  0.30, 2000),
-  ('business', 'Business', 249, 1100, 0.25, 10000)
+  ('pack-50',  '50 Minutes',  12.50, 50,  0.25, 250),
+  ('pack-100', '100 Minutes', 25,    100, 0.25, 500)
 on conflict (id) do nothing;
 
 -- ─── Per-agent subscriptions (subscription is PER AGENT, not platform-wide) ─

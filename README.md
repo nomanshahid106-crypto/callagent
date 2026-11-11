@@ -36,9 +36,9 @@ calling resources — no manual step for him or for support:
 1. **Buys a phone number** — a number is bought on Twilio (platform master
    account) and **assigned to that customer** as his dedicated caller
    number (imported into ElevenLabs so it has its own phone-number ID).
-2. **Allocates his plan's specific minutes** — Starter 150 / Growth 400 /
-   Business 1,100 minutes are credited to his account; calls deduct from
-   these first, the prepaid wallet covers overage.
+2. **Allocates his package's specific minutes** — the 50 Minutes package
+   credits 50 minutes, the 100 Minutes package credits 100 minutes; calls
+   deduct from these first, the prepaid wallet covers overage.
 3. **Calls go from his number** — every campaign call is established from
    the number assigned to him, so recipients always see his own consistent
    caller ID.
@@ -51,13 +51,16 @@ assigned number + minutes are shown on the subscribe success screen, the
 Dashboard ("Your Caller Number"), My Agents, Billing, the New Campaign
 screen, and as "Calling from:" on the Live Campaign screen.
 
-## Plans (per agent, billed by Paddle)
+## Packages (per agent, billed by Paddle)
 
-| Plan | Price | Included minutes | Overage (wallet) | Numbers / campaign |
+Exactly two packages, the same for every agent — both priced at the
+confirmed customer rate of **$0.25/min**, with a flat $0.25/min wallet
+overage on both:
+
+| Package | Price | Included minutes | Overage (wallet) | Numbers / campaign |
 |---|---|---|---|---|
-| Starter | $39/mo | 150 | $0.35/min | 500 |
-| Growth | $99/mo | 400 | $0.30/min | 2,000 |
-| Business | $249/mo | 1,100 | $0.25/min | 10,000 |
+| 50 Minutes | $12.50/mo | 50 | $0.25/min | 250 |
+| 100 Minutes | $25/mo | 100 | $0.25/min | 500 |
 
 Annual billing = 2 months free. Money logic is ledger-based in production
 (subscription minutes first, prepaid wallet second; no balance = campaigns

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { PublicFooter, PublicHeader } from "@/components/PublicChrome";
-import { AGENTS, PLANS, WORKFLOW_STEPS } from "@/lib/data";
+import { AGENTS, formatPrice, PLANS, WORKFLOW_STEPS } from "@/lib/data";
 
 export default function HomePage() {
   return (
@@ -52,7 +52,7 @@ export default function HomePage() {
                   ))}
                 </div>
                 <p className="muted">
-                  From <strong style={{ color: "#fff" }}>$39/mo</strong> · 150
+                  From <strong style={{ color: "#fff" }}>$12.50/mo</strong> · 50
                   minutes included
                 </p>
                 <Link href={`/subscribe/${agent.slug}`} className="btn block">
@@ -85,15 +85,15 @@ export default function HomePage() {
             Every plan includes calling minutes. When they run out, calls
             continue from your prepaid wallet — you never get a surprise bill.
           </p>
-          <div className="grid-3">
+          <div className="grid-2">
             {PLANS.map((plan) => (
-              <div className={`card ${plan.id === "growth" ? "hl" : ""}`} key={plan.id}>
-                {plan.id === "growth" && (
+              <div className={`card ${plan.id === "pack-100" ? "hl" : ""}`} key={plan.id}>
+                {plan.id === "pack-100" && (
                   <span className="badge blue" style={{ marginBottom: 10 }}>Most popular</span>
                 )}
                 <h3>{plan.name}</h3>
                 <div className="price">
-                  ${plan.priceMonthly}
+                  {formatPrice(plan.priceMonthly)}
                   <span> / month</span>
                 </div>
                 <p className="muted small">

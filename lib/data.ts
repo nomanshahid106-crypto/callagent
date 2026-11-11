@@ -116,7 +116,7 @@ export function getAgent(slug: string): AgentDef | undefined {
 }
 
 export interface PlanDef {
-  id: "starter" | "growth" | "business";
+  id: "pack-50" | "pack-100";
   name: string;
   priceMonthly: number;
   includedMinutes: number;
@@ -125,55 +125,49 @@ export interface PlanDef {
   features: string[];
 }
 
+/**
+ * Exactly TWO packages per agent (owner's decision, 2026-11-11) — the same
+ * two for every agent, both priced at the confirmed customer rate of
+ * $0.25/min, with a flat $0.25/min wallet overage on both.
+ */
 export const PLANS: PlanDef[] = [
   {
-    id: "starter",
-    name: "Starter",
-    priceMonthly: 39,
-    includedMinutes: 150,
-    overageRate: 0.35,
-    contactsPerCampaign: 500,
+    id: "pack-50",
+    name: "50 Minutes",
+    priceMonthly: 12.5,
+    includedMinutes: 50,
+    overageRate: 0.25,
+    contactsPerCampaign: 250,
     features: [
-      "150 calling minutes / month",
+      "50 calling minutes / month",
       "1 agent subscription",
-      "Up to 500 numbers per campaign",
+      "Up to 250 numbers per campaign",
       "Call summary + results list",
       "Transcripts included",
     ],
   },
   {
-    id: "growth",
-    name: "Growth",
-    priceMonthly: 99,
-    includedMinutes: 400,
-    overageRate: 0.3,
-    contactsPerCampaign: 2000,
-    features: [
-      "400 calling minutes / month",
-      "1 agent subscription",
-      "Up to 2,000 numbers per campaign",
-      "Call summary + results list",
-      "Auto-retry on no-answer (1×)",
-      "Transcripts + recordings",
-    ],
-  },
-  {
-    id: "business",
-    name: "Business",
-    priceMonthly: 249,
-    includedMinutes: 1100,
+    id: "pack-100",
+    name: "100 Minutes",
+    priceMonthly: 25,
+    includedMinutes: 100,
     overageRate: 0.25,
-    contactsPerCampaign: 10000,
+    contactsPerCampaign: 500,
     features: [
-      "1,100 calling minutes / month",
+      "100 calling minutes / month",
       "1 agent subscription",
-      "Up to 10,000 numbers per campaign",
-      "Custom outcomes + summaries",
-      "Auto-retry (up to 3×)",
-      "Priority support",
+      "Up to 500 numbers per campaign",
+      "Call summary + results list",
+      "Transcripts + recordings",
+      "Auto-retry on no-answer (1×)",
     ],
   },
 ];
+
+/** "$25" for whole dollars, "$12.50" otherwise. */
+export function formatPrice(n: number): string {
+  return n % 1 === 0 ? `$${n}` : `$${n.toFixed(2)}`;
+}
 
 export function getPlan(id: string): PlanDef | undefined {
   return PLANS.find((p) => p.id === id);

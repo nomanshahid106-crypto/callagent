@@ -50,7 +50,7 @@ export default function LoginPage() {
           {just && justAgent && (
             <div className="notice">
               ✅ <strong>Subscription active for {justAgent.name}</strong>
-              {justPlan ? ` (${justPlan.name} plan)` : ""} — login to start
+              {justPlan ? ` (${justPlan.name} package)` : ""} — login to start
               using your agent.
             </div>
           )}

@@ -3,13 +3,13 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useDemo } from "@/components/DemoProvider";
-import { getAgent, getPlan, PLANS } from "@/lib/data";
+import { formatPrice, getAgent, getPlan, PLANS } from "@/lib/data";
 import { provisioningView } from "@/lib/provisioning";
 
 const DEMO_HISTORY = [
-  { date: "2026-10-24", desc: "Truck Dispatcher Agent — Growth plan (monthly)", method: "Paddle · Card •• 4242", amount: "$99.00", status: "Paid" },
+  { date: "2026-10-24", desc: "Truck Dispatcher Agent — 100 Minutes package (monthly)", method: "Paddle · Card •• 4242", amount: "$25.00", status: "Paid" },
   { date: "2026-10-11", desc: "Wallet top-up", method: "Paddle · Card •• 4242", amount: "$25.00", status: "Paid" },
-  { date: "2026-09-24", desc: "Truck Dispatcher Agent — Growth plan (monthly)", method: "Paddle · Card •• 4242", amount: "$99.00", status: "Paid" },
+  { date: "2026-09-24", desc: "Truck Dispatcher Agent — 100 Minutes package (monthly)", method: "Paddle · Card •• 4242", amount: "$25.00", status: "Paid" },
 ];
 
 export default function BillingPage() {
@@ -19,15 +19,15 @@ export default function BillingPage() {
   const agent = state.subscription ? getAgent(state.subscription.agentSlug) : undefined;
   const plan = state.subscription
     ? getPlan(state.subscription.planId)
-    : getPlan("growth");
-  const included = plan?.includedMinutes ?? 400;
+    : getPlan("pack-100");
+  const included = plan?.includedMinutes ?? 100;
   const pct = Math.min(100, Math.round((state.minutesUsed / included) * 100));
   // Provisioning (Step 3b): assigned caller number + allocated plan minutes
   const prov = provisioningView({
     callerNumber: state.subscription?.callerNumber,
     minutesAllocated: state.subscription?.minutesAllocated,
     provisioningMode: state.subscription?.provisioningMode,
-    planId: state.subscription?.planId ?? "growth",
+    planId: state.subscription?.planId ?? "pack-100",
     email: state.user?.email,
   });
   const minutesRemaining = Math.max(0, prov.minutesAllocated - state.minutesUsed);
@@ -54,7 +54,7 @@ export default function BillingPage() {
                 {agent.icon} {agent.name} — {plan.name}
               </p>
               <p className="muted">
-                ${plan.priceMonthly}/month · renews{" "}
+                {formatPrice(plan.priceMonthly)}/month · renews{" "}
                 {state.subscription?.renewalDate ?? "next month"} · billed by
                 Paddle
               </p>
@@ -116,14 +116,14 @@ export default function BillingPage() {
         </div>
       </div>
 
-      <h2 style={{ fontSize: "1.3rem", marginTop: 34 }}>Plans (per agent)</h2>
-      <div className="grid-3">
+      <h2 style={{ fontSize: "1.3rem", marginTop: 34 }}>Packages (per agent)</h2>
+      <div className="grid-2">
         {PLANS.map((p) => {
           const current = plan?.id === p.id;
           return (
             <div className={`card ${current ? "hl" : ""}`} key={p.id}>
               <h3>{p.name}</h3>
-              <div className="price">${p.priceMonthly}<span> / month</span></div>
+              <div className="price">{formatPrice(p.priceMonthly)}<span> / month</span></div>
               <p className="muted small">
                 {p.includedMinutes.toLocaleString()} minutes · overage $
                 {p.overageRate.toFixed(2)}/min · up to{" "}
@@ -133,7 +133,7 @@ export default function BillingPage() {
                 {p.features.map((f) => <li key={f} style={{ marginBottom: 5 }}>{f}</li>)}
               </ul>
               {current ? (
-                <span className="badge green">Current plan</span>
+                <span className="badge green">Current package</span>
               ) : (
                 <button className="btn ghost block" disabled title="Plan changes run through Paddle in production">
                   {p.priceMonthly > (plan?.priceMonthly ?? 0) ? "Upgrade" : "Switch"} (demo)

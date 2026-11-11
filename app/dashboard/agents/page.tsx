@@ -16,7 +16,7 @@ export default function AgentsPage() {
     callerNumber: state.subscription?.callerNumber,
     minutesAllocated: state.subscription?.minutesAllocated,
     provisioningMode: state.subscription?.provisioningMode,
-    planId: state.subscription?.planId ?? "growth",
+    planId: state.subscription?.planId ?? "pack-100",
     email: state.user?.email,
   });
 
@@ -31,7 +31,7 @@ export default function AgentsPage() {
       <p className="muted">
         Your subscription is per agent. The agent you paid for is active; the
         other stays locked until you subscribe to it.
-        {!hasRealSub && " (Demo account default: Truck Dispatcher on Growth.)"}
+        {!hasRealSub && " (Demo account default: Truck Dispatcher on the 100 Minutes package.)"}
       </p>
 
       <div className="grid-2">
@@ -90,7 +90,7 @@ export default function AgentsPage() {
                     Subscribe to Unlock →
                   </Link>
                   <p className="small muted" style={{ marginTop: 8 }}>
-                    From $39/mo · minutes included · billed by Paddle
+                    From $12.50/mo · minutes included · billed by Paddle
                   </p>
                 </div>
               )}

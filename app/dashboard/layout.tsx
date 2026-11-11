@@ -51,7 +51,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               Continue with the demo account
             </button>
             <p className="small muted" style={{ marginTop: 12 }}>
-              Demo account: Truck Dispatcher Agent on the Growth plan.
+              Demo account: Truck Dispatcher Agent on the 100 Minutes package.
             </p>
           </div>
         </div>

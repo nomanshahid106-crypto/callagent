@@ -23,7 +23,7 @@ export default function NewCampaignPage() {
     callerNumber: state.subscription?.callerNumber,
     minutesAllocated: state.subscription?.minutesAllocated,
     provisioningMode: state.subscription?.provisioningMode,
-    planId: state.subscription?.planId ?? "growth",
+    planId: state.subscription?.planId ?? "pack-100",
     email: state.user?.email,
   });
 
