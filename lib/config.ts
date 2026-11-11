@@ -24,6 +24,7 @@ export function serverConfig() {
     elevenlabsAgentPhoneNumberId:
       process.env.ELEVENLABS_AGENT_PHONE_NUMBER_ID ?? "",
     twilioAccountSid: process.env.TWILIO_ACCOUNT_SID ?? "",
+    twilioAuthToken: process.env.TWILIO_AUTH_TOKEN ?? "",
     paddleApiKey: process.env.PADDLE_API_KEY ?? "",
     paddleWebhookSecret: process.env.PADDLE_WEBHOOK_SECRET ?? "",
   };
@@ -39,6 +40,12 @@ export function isElevenLabsConfigured(): boolean {
     c.elevenlabsApiKey && c.elevenlabsAgentPhoneNumberId &&
       (c.elevenlabsAgentIdDispatcher || c.elevenlabsAgentIdBrand),
   );
+}
+
+/** Twilio activates number provisioning (Step 3b) when both values exist. */
+export function isTwilioConfigured(): boolean {
+  const c = serverConfig();
+  return Boolean(c.twilioAccountSid && c.twilioAuthToken);
 }
 
 export function isPaddleConfigured(): boolean {

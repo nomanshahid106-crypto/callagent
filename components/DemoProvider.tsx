@@ -32,6 +32,23 @@ export interface DemoSubscription {
   status: "active";
   startedAt: string;
   renewalDate: string;
+  /**
+   * Provisioning on subscription (Step 3b, owner's workflow 2026-11-11):
+   * the system buys a caller number for this customer and allocates his
+   * plan's specific minutes. In demo mode the number is a labelled demo
+   * number (see POST /api/provision → lib/integrations/twilio.ts).
+   */
+  callerNumber?: string;
+  minutesAllocated?: number;
+  provisioningMode?: "demo" | "live";
+  provisionedAt?: string;
+}
+
+/** Provisioning result handed to subscribe() when a subscription activates. */
+export interface ProvisioningInfo {
+  callerNumber: string;
+  minutesAllocated: number;
+  mode: "demo" | "live";
 }
 
 export type CampaignRunStatus = "running" | "paused" | "stopped" | "completed";
@@ -71,7 +88,12 @@ interface DemoContextValue {
   update: (patch: Partial<DemoState>) => void;
   login: (user: DemoUser) => void;
   logout: () => void;
-  subscribe: (agentSlug: AgentSlug, planId: string, user: DemoUser) => void;
+  subscribe: (
+    agentSlug: AgentSlug,
+    planId: string,
+    user: DemoUser,
+    provisioning?: ProvisioningInfo,
+  ) => void;
   setCampaign: (campaign: Campaign | null) => void;
   addUsage: (minutes: number, walletCharge: number) => void;
   topUpWallet: (amount: number) => void;
@@ -119,7 +141,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
       login: (user) => setState((s) => ({ ...s, user })),
       logout: () =>
         setState((s) => ({ ...s, user: null, justSubscribed: null })),
-      subscribe: (agentSlug, planId, user) =>
+      subscribe: (agentSlug, planId, user, provisioning) =>
         setState((s) => ({
           ...s,
           subscription: {
@@ -128,6 +150,12 @@ export function DemoProvider({ children }: { children: ReactNode }) {
             status: "active",
             startedAt: new Date().toISOString().slice(0, 10),
             renewalDate: renewalDate(),
+            callerNumber: provisioning?.callerNumber,
+            minutesAllocated: provisioning?.minutesAllocated,
+            provisioningMode: provisioning?.mode,
+            provisionedAt: provisioning
+              ? new Date().toISOString().slice(0, 10)
+              : undefined,
           },
           justSubscribed: { agentSlug, planId, email: user.email },
           user: null, // per the final workflow, the customer logs in next

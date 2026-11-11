@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useDemo, type Campaign } from "@/components/DemoProvider";
 import { getAgent, getPlan } from "@/lib/data";
+import { provisioningView } from "@/lib/provisioning";
 import { formatDuration } from "@/lib/phone";
 import { scenarioFor, type CallResult } from "@/lib/simulation";
 import { StatusBadge } from "@/components/StatusBadge";
@@ -17,6 +18,14 @@ export default function LivePage() {
   campaignRef.current = campaign;
 
   const agent = campaign ? getAgent(campaign.agentSlug) : undefined;
+  // Provisioning (Step 3b): calls are established from the assigned number
+  const prov = provisioningView({
+    callerNumber: state.subscription?.callerNumber,
+    minutesAllocated: state.subscription?.minutesAllocated,
+    provisioningMode: state.subscription?.provisioningMode,
+    planId: state.subscription?.planId ?? "growth",
+    email: state.user?.email,
+  });
   const plan = getPlan(state.subscription?.planId ?? "growth");
   const included = plan?.includedMinutes ?? 400;
   const overage = plan?.overageRate ?? 0.3;
@@ -175,6 +184,12 @@ export default function LivePage() {
             <strong>{agent?.icon} {agent?.name}</strong>
             <div className="small muted">
               {done} of {total} numbers called · calls run one by one
+              <br />
+              📞 Calling from: <strong style={{ color: "#fff" }}>{prov.callerNumber}</strong>{" "}
+              (your assigned number)
+              {prov.isDemoNumber && (
+                <span className="badge demo" style={{ marginLeft: 6 }}>Demo number</span>
+              )}
             </div>
           </div>
           <div style={{ display: "flex", gap: 10 }}>

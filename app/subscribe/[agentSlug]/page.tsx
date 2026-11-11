@@ -7,6 +7,8 @@ import { PublicFooter, PublicHeader } from "@/components/PublicChrome";
 import { useDemo } from "@/components/DemoProvider";
 import { getAgent, PLANS, type PlanDef } from "@/lib/data";
 import { openCheckout } from "@/lib/integrations/paddle";
+import { demoCallerNumber } from "@/lib/phone";
+import type { ProvisioningInfo } from "@/components/DemoProvider";
 
 type Phase = "form" | "checkout" | "processing" | "success";
 
@@ -23,6 +25,7 @@ export default function SubscribePage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [phase, setPhase] = useState<Phase>("form");
+  const [provision, setProvision] = useState<ProvisioningInfo | null>(null);
 
   const plan: PlanDef = useMemo(
     () => PLANS.find((p) => p.id === planId) ?? PLANS[1],
@@ -66,12 +69,46 @@ export default function SubscribePage() {
     setPhase("checkout");
   }
 
-  function onPay() {
+  async function onPay() {
     setPhase("processing");
+    // Provisioning on subscription (Step 3b): the moment the subscription
+    // activates, the system buys/assigns this customer's caller number and
+    // allocates his plan's specific minutes. The server route does the real
+    // Twilio purchase when configured; in demo mode it returns a labelled
+    // demo number. Client fallback keeps the flow working offline.
+    let provisioning: ProvisioningInfo = {
+      callerNumber: demoCallerNumber(email),
+      minutesAllocated: plan.includedMinutes,
+      mode: "demo",
+    };
+    try {
+      const res = await fetch("/api/provision", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, planId, agentSlug: agent!.slug }),
+      });
+      if (res.ok) {
+        const data = (await res.json()) as {
+          mode?: string;
+          callerNumber?: string;
+          minutesAllocated?: number;
+        };
+        if (data.callerNumber) {
+          provisioning = {
+            callerNumber: data.callerNumber,
+            minutesAllocated: data.minutesAllocated ?? plan.includedMinutes,
+            mode: data.mode === "live" ? "live" : "demo",
+          };
+        }
+      }
+    } catch {
+      // keep the client-side demo fallback above
+    }
     window.setTimeout(() => {
-      subscribe(agent!.slug, planId, { name, business, email });
+      subscribe(agent!.slug, planId, { name, business, email }, provisioning);
+      setProvision(provisioning);
       setPhase("success");
-    }, 1400);
+    }, 900);
   }
 
   return (
@@ -99,6 +136,29 @@ export default function SubscribePage() {
               plan ({plan.includedMinutes} minutes included). Your account was
               created with <strong style={{ color: "#fff" }}>{email}</strong>.
             </p>
+            {provision && (
+              <div className="alert" style={{ textAlign: "left", margin: "16px 0" }}>
+                <strong>📞 Your calling resources are provisioned:</strong>
+                <div style={{ marginTop: 8 }}>
+                  Your caller number:{" "}
+                  <strong style={{ color: "#fff" }}>{provision.callerNumber}</strong>
+                  {provision.mode === "demo" && (
+                    <span className="badge demo" style={{ marginLeft: 8 }}>Demo number</span>
+                  )}
+                  <br />
+                  <strong style={{ color: "#fff" }}>
+                    {provision.minutesAllocated.toLocaleString()} minutes
+                  </strong>{" "}
+                  allocated from your {plan.name} plan.
+                  <br />
+                  <span className="small muted">
+                    Every call you make will be established from this number.
+                    {provision.mode === "demo" &&
+                      " In production a real number is bought automatically via Twilio the moment you subscribe."}
+                  </span>
+                </div>
+              </div>
+            )}
             <p className="muted">Next step: login to start using your agent.</p>
             <button className="btn white" onClick={() => router.push("/login")}>
               Proceed to Login →

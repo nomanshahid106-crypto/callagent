@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useDemo } from "@/components/DemoProvider";
 import { getAgent, getPlan, PLANS } from "@/lib/data";
+import { provisioningView } from "@/lib/provisioning";
 
 const DEMO_HISTORY = [
   { date: "2026-10-24", desc: "Truck Dispatcher Agent — Growth plan (monthly)", method: "Paddle · Card •• 4242", amount: "$99.00", status: "Paid" },
@@ -21,6 +22,15 @@ export default function BillingPage() {
     : getPlan("growth");
   const included = plan?.includedMinutes ?? 400;
   const pct = Math.min(100, Math.round((state.minutesUsed / included) * 100));
+  // Provisioning (Step 3b): assigned caller number + allocated plan minutes
+  const prov = provisioningView({
+    callerNumber: state.subscription?.callerNumber,
+    minutesAllocated: state.subscription?.minutesAllocated,
+    provisioningMode: state.subscription?.provisioningMode,
+    planId: state.subscription?.planId ?? "growth",
+    email: state.user?.email,
+  });
+  const minutesRemaining = Math.max(0, prov.minutesAllocated - state.minutesUsed);
 
   function topUp(amount: number) {
     topUpWallet(amount);
@@ -49,8 +59,23 @@ export default function BillingPage() {
                 Paddle
               </p>
               <div className="order-row">
+                <span>Assigned caller number</span>
+                <span>
+                  📞 {prov.callerNumber}{" "}
+                  {prov.isDemoNumber && <span className="badge demo">Demo number</span>}
+                </span>
+              </div>
+              <div className="order-row">
+                <span>Plan minutes allocated</span>
+                <span>{prov.minutesAllocated.toLocaleString()} min</span>
+              </div>
+              <div className="order-row">
                 <span>Minutes used this month</span>
                 <span>{state.minutesUsed} / {included}</span>
+              </div>
+              <div className="order-row">
+                <span>Minutes remaining</span>
+                <span>{minutesRemaining.toLocaleString()} min</span>
               </div>
               <div className="bar" style={{ margin: "10px 0" }}>
                 <div style={{ width: `${pct}%` }} />

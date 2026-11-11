@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useDemo } from "@/components/DemoProvider";
 import { AGENTS } from "@/lib/data";
+import { provisioningView } from "@/lib/provisioning";
 
 export default function AgentsPage() {
   const { state } = useDemo();
@@ -10,6 +11,14 @@ export default function AgentsPage() {
   const activeSlug =
     state.subscription?.agentSlug ?? "truck-dispatcher";
   const hasRealSub = Boolean(state.subscription);
+  // Provisioning (Step 3b): the subscribed agent calls from the assigned number
+  const prov = provisioningView({
+    callerNumber: state.subscription?.callerNumber,
+    minutesAllocated: state.subscription?.minutesAllocated,
+    provisioningMode: state.subscription?.provisioningMode,
+    planId: state.subscription?.planId ?? "growth",
+    email: state.user?.email,
+  });
 
   return (
     <>
@@ -55,6 +64,20 @@ export default function AgentsPage() {
                 <strong style={{ color: "#fff" }}>First message:</strong>{" "}
                 “{agent.firstMessage}”
               </p>
+              {active && (
+                <p className="small" style={{ marginTop: 10 }}>
+                  📞 Calls will be made from{" "}
+                  <strong>{prov.callerNumber}</strong>
+                  {prov.isDemoNumber && (
+                    <span className="badge demo" style={{ marginLeft: 8 }}>Demo number</span>
+                  )}
+                  <br />
+                  <span className="muted">
+                    {prov.minutesAllocated.toLocaleString()} plan minutes allocated
+                    to your account.
+                  </span>
+                </p>
+              )}
               {active ? (
                 <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 12 }}>
                   <Link href="/dashboard/campaigns/new" className="btn sm">Start Calling</Link>

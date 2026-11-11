@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useDemo } from "@/components/DemoProvider";
 import { AGENTS } from "@/lib/data";
+import { provisioningView } from "@/lib/provisioning";
 import { parseNumberList } from "@/lib/phone";
 
 const EXAMPLE = `+12145550134
@@ -17,6 +18,14 @@ export default function NewCampaignPage() {
   const router = useRouter();
   const { state, setCampaign } = useDemo();
   const activeSlug = state.subscription?.agentSlug ?? "truck-dispatcher";
+  // Provisioning (Step 3b): calls go out from the customer's assigned number
+  const prov = provisioningView({
+    callerNumber: state.subscription?.callerNumber,
+    minutesAllocated: state.subscription?.minutesAllocated,
+    provisioningMode: state.subscription?.provisioningMode,
+    planId: state.subscription?.planId ?? "growth",
+    email: state.user?.email,
+  });
 
   const [name, setName] = useState("");
   const [agentSlug, setAgentSlug] = useState<string>(activeSlug);
@@ -98,6 +107,18 @@ export default function NewCampaignPage() {
             );
           })}
         </select>
+
+        <div className="alert" style={{ marginBottom: 16 }}>
+          📞 Calls will be made from your assigned number{" "}
+          <strong>{prov.callerNumber}</strong>
+          {prov.isDemoNumber && (
+            <span className="badge demo" style={{ marginLeft: 8 }}>Demo number</span>
+          )}
+          <span className="small muted" style={{ display: "block", marginTop: 4 }}>
+            Provisioned when you subscribed, with{" "}
+            {prov.minutesAllocated.toLocaleString()} plan minutes allocated.
+          </span>
+        </div>
 
         <label className="flabel" htmlFor="numbers">Phone numbers (one per line)</label>
         <textarea

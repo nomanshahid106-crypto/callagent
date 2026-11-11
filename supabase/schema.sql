@@ -12,6 +12,8 @@ create table if not exists workspaces (
   id uuid primary key default gen_random_uuid(),
   name text not null,                       -- business name
   owner_id uuid not null,                   -- auth.users id
+  caller_number text,                       -- dedicated Twilio number bought + assigned on subscription (Step 3b provisioning)
+  elevenlabs_phone_number_id text,          -- that number's id inside ElevenLabs (passed on every outbound call)
   created_at timestamptz not null default now()
 );
 

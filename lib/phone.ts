@@ -58,6 +58,24 @@ export function parseNumberList(text: string): ParsedNumber[] {
   return out;
 }
 
+/**
+ * Deterministic DEMO caller number for a subscriber (provisioning, Step 3b).
+ *
+ * In demo mode no real Twilio number is bought, so each demo account gets a
+ * stable fictional number from the reserved 555-01XX range, derived from the
+ * account email — different demo users see different numbers, and the same
+ * user always sees the same one. Labelled "Demo number" wherever shown.
+ */
+export function demoCallerNumber(email: string): string {
+  const seed = (email || "demo@callagent.app").trim().toLowerCase();
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) {
+    h = (h * 31 + seed.charCodeAt(i)) >>> 0;
+  }
+  const line = 100 + (h % 100); // 0100–0199 — the fictional-use range
+  return `+1 (555) 0${line}`;
+}
+
 export function formatDuration(totalSeconds: number): string {
   if (!totalSeconds) return "0:00";
   const m = Math.floor(totalSeconds / 60);
